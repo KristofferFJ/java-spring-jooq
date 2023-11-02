@@ -1,0 +1,9 @@
+server:
+  port: 3141
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/java_spring_jooq
+    username: pi
+    password: pi
+  flyway:
+    clean-disabled: false
