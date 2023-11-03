@@ -1,4 +1,4 @@
 package io.kristofferfj.javaspringjooq.domain.company;
 
-public record Company(Long id, String name) {
+public record Company(Long id, String name, Long bmPayId) {
 }

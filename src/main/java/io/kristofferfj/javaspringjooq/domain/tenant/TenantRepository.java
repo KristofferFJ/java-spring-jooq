@@ -1,5 +1,6 @@
 package io.kristofferfj.javaspringjooq.domain.tenant;
 
+import io.kristofferfj.javaspringjooq.domain.bill.Bill;
 import io.kristofferfj.jooq.public_.tables.records.TenantRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,12 @@ public class TenantRepository {
                 );
     }
 
+    @Transactional(readOnly = true)
+    public Tenant getTenantForBill(Bill bill) {
+        TenantRecord tenantRecord = dslContext.selectFrom(TENANT).where(TENANT.ID.eq(bill.tenantId())).fetchSingle();
+        return toTenant(tenantRecord);
+    }
+
     @Transactional
     public Tenant createNewTenancy(String name, String email, Long tenancyId) {
         TenantRecord createdTenant = dslContext.insertInto(TENANT)
@@ -37,6 +44,10 @@ public class TenantRepository {
                 .values(name, email, tenancyId)
                 .returning()
                 .fetchSingle();
-        return new Tenant(createdTenant.getId(), createdTenant.getName(), createdTenant.getEmail(), createdTenant.getTenancyId());
+        return toTenant(createdTenant);
+    }
+
+    private Tenant toTenant(TenantRecord tenantRecord) {
+        return new Tenant(tenantRecord.getId(), tenantRecord.getName(), tenantRecord.getEmail(), tenantRecord.getTenancyId());
     }
 }

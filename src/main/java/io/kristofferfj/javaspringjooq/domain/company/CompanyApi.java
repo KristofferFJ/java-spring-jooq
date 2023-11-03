@@ -1,5 +1,6 @@
 package io.kristofferfj.javaspringjooq.domain.company;
 
+import io.kristofferfj.javaspringjooq.service.BmPayClientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,9 +11,12 @@ import java.util.List;
 public class CompanyApi {
 
     private final CompanyRepository companyRepository;
+    private final BmPayClientService bmPayClientService;
 
-    public CompanyApi(CompanyRepository companyRepository) {
+    public CompanyApi(CompanyRepository companyRepository,
+                      BmPayClientService bmPayClientService) {
         this.companyRepository = companyRepository;
+        this.bmPayClientService = bmPayClientService;
     }
 
     @PostMapping
@@ -27,6 +31,13 @@ public class CompanyApi {
     @GetMapping("all")
     public ResponseEntity<CompaniesDto> getAllCompanies() {
         return ResponseEntity.ok(new CompaniesDto(companyRepository.getCompanies()));
+    }
+
+    @PostMapping("{companyId}/register-bmpay")
+    public ResponseEntity<Boolean> registerCompanyBmPay(@PathVariable Long companyId) {
+        Company company = companyRepository.findById(companyId);
+        bmPayClientService.createCompanyInBmPay(company);
+        return ResponseEntity.ok(true);
     }
 
     public record NewCompany(String name) {
